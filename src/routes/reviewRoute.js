@@ -1,5 +1,6 @@
 const express = require("express");
-const Router = express.Router();
+// mergeParams to receved the parent params in the request object
+const Router = express.Router({ mergeParams: true });
 const reviewController = require("../controllers/reviewController");
 
 Router.get("/", (req, res) => {
