@@ -2,6 +2,8 @@ const express = require("express");
 const Router = express.Router();
 const bookController = require("../controllers/bookController");
 
+const reviewRouter = require("./reviewRoute");
+
 Router.get("/", (req, res) => {
   bookController.getAllBooks(req, res);
 });
@@ -22,4 +24,5 @@ Router.delete("/:id", (req, res) => {
   bookController.deleteBook(req, res);
 });
 
+Router.use("/:bookId/review", reviewRouter);
 module.exports = Router;
