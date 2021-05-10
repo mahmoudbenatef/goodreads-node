@@ -20,6 +20,9 @@ mongoose.connect(
   }
 );
 const userRouter = require("./src/routes/userRoute");
+const authorRouter = require("./src/routes/authorRoute");
+const bookRouter = require("./src/routes/bookRoute");
+const categoryRouter = require("./src/routes/categoryRoute");
 
 app.use(express.json());
 app.use(cors());
@@ -44,6 +47,10 @@ app.use(function (req, res, next) {
   }
 });
 app.use("/users", userRouter);
+app.use("/author", authorRouter);
+app.use("/books", bookRouter);
+app.use("/category", categoryRouter);
+
 app.get("/", (req, res) => {
   res.end("hello at home page atef");
 });
