@@ -6,6 +6,8 @@ const cors = require('cors')
 const port = 3001;
 const app = express()
 var userHandlers = require('./src/controllers/userController.js');
+app.use('/public',express.static('public'));
+
 mongoose.connect(
     // process.env.MONGO_CONNECTION_STRING+"/goodreads"|| 
     "mongodb://localhost:27017/goodreads",{useNewUrlParser:true,useUnifiedTopology:true},(err)=>{
@@ -43,3 +45,5 @@ app.listen(process.env.PORT ||port,(err)=>{
     else
         console.log("connected successfully on port "+port)
 })
+
+// app.use(express.static('public'));

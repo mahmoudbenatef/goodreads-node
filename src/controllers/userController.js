@@ -5,17 +5,21 @@ jwt = require('jsonwebtoken')
 
 var mongoose = require('mongoose')
 
+
+
 exports.register = async function(req, res) {
+
     const userData = req.body
+    console.log(req.body)
     userData.hash_password = bcrypt.hashSync(req.body.password, 10);
 
     const userInstance = new UserModel({name:userData.name,email:userData.email
         ,lastname:userData.lastname,gender:userData.gender,password:userData.hash_password
-        ,role:userData.role
+        ,role:userData.role,avatar:req.file.path
     })
     try{
         let user = await userInstance.save()
-        user.hash_password = undefined;
+        user.password = undefined;
         return res.status(200).json(user)
     }
     catch (err){

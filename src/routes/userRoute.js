@@ -4,10 +4,19 @@ const express = require("express"),
     bcrypt = require('bcrypt')
 
 var userHandlers = require('../controllers/userController.js');
+const multer = require('multer')
 
-console.log("here")
-Router.post("/register"
-    , (req, res) => {
+var storage = multer.diskStorage({
+   destination: function (req, file, cb) {
+   cb(null, 'public')
+ },
+ filename: function (req, file, cb) {
+   cb(null, Date.now() + '-' +file.originalname )
+ }
+})
+var upload = multer({ storage: storage })
+
+Router.post("/register" , upload.single('avatar') ,(req, res) => {
         userHandlers.register(req, res)
     })
 
