@@ -42,17 +42,6 @@ const UserScheme = new mongoose.Schema({
   },
 });
 
-UserScheme.pre("save", function (next) {
-  if (this.isNew) {
-    bcrypt.hash(this.password, 10, (err, hashedPassword) => {
-      this.password = hashedPassword;
-      next();
-    });
-  } else {
-    next();
-  }
-});
-
 UserScheme.methods.comparePassword = function (password, hash_password) {
   console.log("comparing");
   try {
