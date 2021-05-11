@@ -6,24 +6,24 @@ const READ = 3;
 
 const userBookSchema = new mongoose.Schema({
   book: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Book",
     required: true,
   },
   user: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
   shelf: {
-    type: String,
-    required: true,
+    type: Number,
     enum: [WANT_TO_READ, CURRENTLY_READING, READ],
+    required: true,
   },
   rating: {
     type: Number,
     min: 0,
-    max: 5,
+    max: 5
   },
   review: {
     type: String,
