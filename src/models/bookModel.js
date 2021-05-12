@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { rateSchema } = require("../models/rateModel");
 
 const bookSchema = new mongoose.Schema({
   name: {

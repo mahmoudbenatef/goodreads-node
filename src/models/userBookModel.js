@@ -23,13 +23,13 @@ const userBookSchema = new mongoose.Schema({
   rating: {
     type: Number,
     min: 0,
-    max: 5
+    max: 5,
   },
   review: {
     type: String,
     maxLength: 5000,
     trim: true,
-  }
+  },
 });
 
 const userBookModel = mongoose.model("UserBook", userBookSchema);
