@@ -2,13 +2,17 @@ const bookModel = require("../models/bookModel");
 const statusCode = require("../helper/statusCode");
 const bookValidator = require("../validators/bookValidator");
 const handler = require("../helper/controllersHelper");
-const { rateModel } = require("../models/rateModel");
+const UserBookModel = require("../models/userBookModel");
+const shelves = require("../shelves");
+
 const getAllBooks = async (req, res) => {
   // get all books
   const allBooks = await bookModel.find({});
   if (allBooks.length > 0) return res.status(statusCode.Success).json(allBooks); // collection has data
   return res.status(statusCode.NoContent).end(); // collection is empty
 };
+
+
 const getBookById = async (req, res, next) => {
   const bookId = req.params.id;
   // gard
@@ -23,6 +27,8 @@ const getBookById = async (req, res, next) => {
     next(error);
   }
 };
+
+
 const createBook = (req, res, next) => {
   const data = req.body;
   // function gard
@@ -40,6 +46,7 @@ const createBook = (req, res, next) => {
     }
   });
 };
+
 
 const updateBook = (req, res) => {
   const data = req.body;
@@ -62,6 +69,7 @@ const updateBook = (req, res) => {
   });
 };
 
+
 const deleteBook = async (req, res, next) => {
   const bookId = req.params.id;
   if (!bookId) handler.handelEmptyData(res);
@@ -73,12 +81,47 @@ const deleteBook = async (req, res, next) => {
   }
 };
 
+
+// Rate book.
+const rateBook = async (request, response) => {
+  try {
+    const userId = request.body.user;
+    const bookId = request.params.bid;
+    const rating = request.body.rating;
+    const book = await UserBookModel.findOneAndUpdate(
+      {
+        book: bookId,
+        user: userId,
+      },
+      {
+        rating: rating,
+      },
+      { useFindAndModify: false }
+    );
+    if (book) response.sendStatus(200);
+    else {
+      const userBookInstance = new UserBookModel({
+        book: bookId,
+        user: userId,
+        rating: rating,
+        shelf: shelves.READ,
+      });
+      const userBookDoc = await userBookInstance.save();
+      response.status(200).json(userBookDoc);
+    }
+  } catch (err) {
+    return response.status(500).json(err);
+  }
+};
+
+
 module.exports = {
   getAllBooks,
   getBookById,
   createBook,
   deleteBook,
   updateBook,
-  updateRate,
-  rate,
+  rateBook
 };
+
+

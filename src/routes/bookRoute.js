@@ -2,8 +2,6 @@ const express = require("express");
 const Router = express.Router();
 const bookController = require("../controllers/bookController");
 
-const reviewRouter = require("./reviewRoute");
-
 Router.get("/", (req, res, next) => {
   bookController.getAllBooks(req, res, next);
 });
@@ -23,5 +21,8 @@ Router.patch("/:id", (req, res, next) => {
 Router.delete("/:id", (req, res, next) => {
   bookController.deleteBook(req, res, next);
 });
+
+//Rate Book.
+Router.post("/:bid/rate", book_controller.rateBook );
 
 module.exports = Router;

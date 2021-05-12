@@ -1,23 +1,20 @@
 const mongoose = require("mongoose");
-
-const WANT_TO_READ = 1;
-const CURRENTLY_READING = 2;
-const READ = 3;
+const shelves = require("../shelves");
 
 const userBookSchema = new mongoose.Schema({
   book: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "Book",
     required: true,
   },
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "User",
     required: true,
   },
   shelf: {
     type: Number,
-    enum: [WANT_TO_READ, CURRENTLY_READING, READ],
+    enum: [shelves.WANT_TO_READ, shelves.CURRENTLY_READING, shelves.READ],
     required: true,
   },
   rating: {
