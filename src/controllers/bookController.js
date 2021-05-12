@@ -81,6 +81,26 @@ const deleteBook = async (req, res, next) => {
   }
 };
 
+//Update the average rating of the given book
+async function updateBookAvgRating(bookId) {
+  const ratings = await UserBookModel.find({
+    book: bookId,
+    rating: {
+      $exists: true,
+    },
+  });
+  const avgRating =
+    ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
+  const book = await bookModel.findOneAndUpdate(
+    {
+      _id: bookId,
+    },
+    {
+      avgRating: avgRating,
+    },
+    { useFindAndModify: false }
+  );
+}
 
 // Rate book.
 const rateBook = async (request, response) => {
@@ -109,6 +129,7 @@ const rateBook = async (request, response) => {
       const userBookDoc = await userBookInstance.save();
       response.status(200).json(userBookDoc);
     }
+    updateBookAvgRating(bookId);
   } catch (err) {
     return response.status(500).json(err);
   }
