@@ -73,56 +73,6 @@ const deleteBook = async (req, res, next) => {
   }
 };
 
-const rate = async (req, res, next) => {
-  const bookId = req.params.id;
-  const data = req.body;
-  if (!bookId || !data) handler.handelEmptyData(res);
-
-  // validate the data for rate instance
-
-  bookValidator.validateRate(data, async (err) => {
-    // if there any  validation errors pass it to errorsHandler middleware
-    if (err) return next(err);
-
-    // create new rate instance
-    try {
-      const newRate = await rateModel.create({ ...data });
-      // update the rate array for this instance
-      const book = await bookModel.findById({ _id: bookId });
-      book.rate.push(newRate);
-      await book.save();
-      return res.status(statusCode.Created).end();
-    } catch (error) {
-      // if the unique constraine fired that mean,
-      // the user already create a rate before, if he need to update will use another endpoint
-      next(error);
-    }
-  });
-};
-
-const updateRate = async (req, res, next) => {
-  // book id, user id, new rate
-  const data = req.body;
-  const bookId = req.params.id;
-  if (!bookId || !data) handler.handelEmptyData(res);
-  //validate data
-  bookValidator.validateRate(data, async (err) => {
-    if (err) return next(err);
-
-    const { user, stars, review } = data;
-    // get the target book
-    const book = await bookModel.findById({ _id: bookId });
-
-    // get the user rate
-    const userRate = book.rate.find((r) => r.user == user);
-
-    // update the rate
-    userRate.stars = stars;
-    if (review) userRate.review = review;
-    await book.save();
-    return res.status(statusCode.NoContent).end();
-  });
-};
 module.exports = {
   getAllBooks,
   getBookById,

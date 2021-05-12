@@ -24,12 +24,4 @@ Router.delete("/:id", (req, res, next) => {
   bookController.deleteBook(req, res, next);
 });
 
-Router.post("/:id/rate", (req, res, next) => {
-  bookController.rate(req, res, next);
-});
-
-Router.patch("/:id/rate", (req, res, next) => {
-  bookController.updateRate(req, res, next);
-});
-
 module.exports = Router;
