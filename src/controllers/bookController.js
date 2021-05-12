@@ -100,11 +100,35 @@ const rate = async (req, res, next) => {
   });
 };
 
+const updateRate = async (req, res, next) => {
+  // book id, user id, new rate
+  const data = req.body;
+  const bookId = req.params.id;
+  if (!bookId || !data) handler.handelEmptyData(res);
+  //validate data
+  bookValidator.validateRate(data, async (err) => {
+    if (err) return next(err);
+
+    const { user, stars, review } = data;
+    // get the target book
+    const book = await bookModel.findById({ _id: bookId });
+
+    // get the user rate
+    const userRate = book.rate.find((r) => r.user == user);
+
+    // update the rate
+    userRate.stars = stars;
+    if (review) userRate.review = review;
+    await book.save();
+    return res.status(statusCode.NoContent).end();
+  });
+};
 module.exports = {
   getAllBooks,
   getBookById,
   createBook,
   deleteBook,
   updateBook,
+  updateRate,
   rate,
 };

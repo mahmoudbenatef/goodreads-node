@@ -27,5 +27,10 @@ Router.delete("/:id", (req, res, next) => {
 Router.post("/:id/rate", (req, res, next) => {
   bookController.rate(req, res, next);
 });
+
+Router.patch("/:id/rate", (req, res, next) => {
+  bookController.updateRate(req, res, next);
+});
+
 Router.use("/:bookId/review", reviewRouter);
 module.exports = Router;

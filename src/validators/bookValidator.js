@@ -27,7 +27,8 @@ const validateRate = (data, callBackFunction) => {
 
   //validate data
   if (!user) errors["user"] = addNewRateErrorMessages.user;
-  if (!stars) errors["stars"] = addNewRateErrorMessages.start;
+  if (!stars || parseInt(stars) < 0 || parseInt(stars) > 5)
+    errors["stars"] = addNewRateErrorMessages.start;
   if (review && typeof review !== "string")
     errors["review"] = addNewRateErrorMessages.review;
 
