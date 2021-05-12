@@ -2,6 +2,27 @@ const BookModel = require("../models/bookModel");
 const UserBookModel = require("../models/userBookModel");
 const shelves = require("../shelves");
 
+//Update the average rating of the given book
+async function updateBookAvgRating(bookId) {
+  const ratings = await UserBookModel.find({
+    book: bookId,
+    rating: {
+      $exists: true,
+    },
+  });
+  const avgRating =
+    ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
+  const book = await BookModel.findOneAndUpdate(
+    {
+      _id: bookId,
+    },
+    {
+      avgRating: avgRating,
+    },
+    { useFindAndModify: false }
+  );
+}
+
 // Rate book.
 exports.book_rate = async (request, response) => {
   try {
@@ -29,6 +50,7 @@ exports.book_rate = async (request, response) => {
       const userBookDoc = await userBookInstance.save();
       response.status(200).json(userBookDoc);
     }
+    updateBookAvgRating(bookId);
   } catch (err) {
     return res.status(500).json(err);
   }
