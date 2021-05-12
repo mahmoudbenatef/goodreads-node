@@ -4,24 +4,24 @@ const bookController = require("../controllers/bookController");
 
 const reviewRouter = require("./reviewRoute");
 
-Router.get("/", (req, res) => {
-  bookController.getAllBooks(req, res);
+Router.get("/", (req, res, next) => {
+  bookController.getAllBooks(req, res, next);
 });
 
-Router.get("/:id", (req, res) => {
-  bookController.getBookById(req, res);
+Router.get("/:id", (req, res, next) => {
+  bookController.getBookById(req, res, next);
 });
 
-Router.post("/", (req, res) => {
-  bookController.createBook(req, res);
+Router.post("/", (req, res, next) => {
+  bookController.createBook(req, res, next);
 });
 
-Router.patch("/:id", (req, res) => {
-  bookController.updateBook(req, res);
+Router.patch("/:id", (req, res, next) => {
+  bookController.updateBook(req, res, next);
 });
 
-Router.delete("/:id", (req, res) => {
-  bookController.deleteBook(req, res);
+Router.delete("/:id", (req, res, next) => {
+  bookController.deleteBook(req, res, next);
 });
 
 Router.use("/:bookId/review", reviewRouter);

@@ -66,6 +66,6 @@ app.listen(process.env.PORT || port, (err) => {
 app.use((err, req, res, next) => {
   console.log("**************ERROR****************** \n \n", err);
   console.log("**************ERROR****************** \n \n");
-  res.json(err._message);
+  res.status(400).json(err._message || err);
   next();
 });
