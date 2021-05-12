@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jsonwebtoken = require("jsonwebtoken");
-
+const statusCode = require("./src/helper/statusCode");
 const cors = require("cors");
 const port = 3001;
 const app = express();
@@ -66,6 +66,14 @@ app.listen(process.env.PORT || port, (err) => {
 app.use((err, req, res, next) => {
   console.log("**************ERROR****************** \n \n", err);
   console.log("**************ERROR****************** \n \n");
-  res.status(400).json(err._message || err);
-  next();
+
+  // error from mongoDB, but dose not work !!!!!
+  if (err.name === "MongoError") {
+    return res
+      .status(statusCode.ServerError)
+      .json({ message: "some thing wronge happend" });
+  }
+
+  // error from validation
+  if (err) return res.status(statusCode.BadRequest).json(err);
 });
