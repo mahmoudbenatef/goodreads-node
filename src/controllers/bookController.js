@@ -1,6 +1,7 @@
 const bookModel = require("../models/bookModel");
 const statusCode = require("../helper/statusCode");
 const bookValidator = require("../validators/bookValidator");
+const handler = require("../helper/controllersHelper");
 
 const getAllBooks = async (req, res) => {
   const allBooks = await bookModel.find({});
@@ -10,7 +11,7 @@ const getAllBooks = async (req, res) => {
 const getBookById = async (req, res, next) => {
   const bookId = req.params.id;
   // gard
-  if (!bookId) handelEmptyData();
+  if (!bookId) handler.handler.handelEmptyData(res);
   try {
     const book = await bookModel.findById(bookId);
     if (book) return res.status(statusCode.Success).json(book);
@@ -23,33 +24,41 @@ const getBookById = async (req, res, next) => {
 };
 const createBook = (req, res, next) => {
   const data = req.body;
-  if (!data) handelEmptyData();
+  if (!data) handler.handler.handelEmptyData(res);
   bookValidator.validateData(data, (err) => {
     if (err) return next(err);
-    const newBook = bookModel.create({ ...data });
-    res.status(statusCode.Created).end();
+    try {
+      const newBook = bookModel.create({ ...data });
+      res.status(statusCode.Created).end();
+    } catch (error) {
+      next(error);
+    }
   });
 };
 
 const updateBook = (req, res) => {
   const data = req.body;
-  if (!data) handelEmptyData();
+  if (!data) handler.handler.handelEmptyData(res);
 
   bookValidator.validateData(data, async (err) => {
     if (err) return next(err);
-    const updatedBook = await bookModel.findByIdAndUpdate(
-      { _id: req.params.id },
-      { ...data }
-    );
-    res.status(statusCode.NoContent).end();
+    try {
+      const updatedBook = await bookModel.findByIdAndUpdate(
+        { _id: req.params.id },
+        { ...data }
+      );
+      res.status(statusCode.NoContent).end();
+    } catch (error) {
+      next(error);
+    }
   });
 };
 
 const deleteBook = async (req, res, next) => {
-  const data = req.body;
-  if (!data) handelEmptyData();
+  const bookId = req.params.id;
+  if (!bookId) handler.handler.handelEmptyData(res);
   try {
-    const resulat = await bookModel.findByIdAndDelete({ _id: req.params.id });
+    const resulat = await bookModel.findByIdAndDelete({ _id: bookId });
     res.status(statusCode.NoContent).end();
   } catch (error) {
     next(error);
@@ -63,5 +72,3 @@ module.exports = {
   deleteBook,
   updateBook,
 };
-
-const handelEmptyData = (res) => res.status(statusCode.BadRequest).end();

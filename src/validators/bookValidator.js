@@ -7,7 +7,8 @@ const validateData = (data, callBackFunction) => {
   const { name, image, author, category } = data;
 
   //validate data
-  if (!name) errors["name"] = validationErrorMessages.name;
+  if (!name || typeof name !== "string")
+    errors["name"] = validationErrorMessages.name;
   if (!image) errors["image"] = validationErrorMessages.image;
   if (!author) errors["author"] = validationErrorMessages.author;
   if (!category) errors["category"] = validationErrorMessages.category;

@@ -47,7 +47,7 @@ app.use(function (req, res, next) {
   }
 });
 app.use("/users", userRouter);
-app.use("/author", authorRouter);
+app.use("/authors", authorRouter);
 app.use("/books", bookRouter);
 app.use("/category", categoryRouter);
 
