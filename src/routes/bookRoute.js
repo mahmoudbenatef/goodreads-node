@@ -25,4 +25,7 @@ Router.delete("/:id", (req, res, next) => {
 //Rate Book.
 Router.post("/:id/rate", bookController.rateBook );
 
+//Shelve Book.
+Router.post("/:id/shelve", bookController.shelveBook );
+
 module.exports = Router;
