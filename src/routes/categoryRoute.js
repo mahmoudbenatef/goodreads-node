@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require("express");
 const Router = express.Router();
 const categoryController = require("../controllers/categoryController");
@@ -23,3 +24,17 @@ Router.delete("/:id", (req, res) => {
 });
 
 module.exports = Router;
+=======
+const express = require("express")
+const {createOne , getAll, deleteOne,updateOne} = require('../controllers/categoryController.js');
+
+Router = express.Router()
+
+
+Router.route("/").post(createOne).get(getAll)
+// Router.route('/:id')
+
+
+Router.route("/:id").delete(deleteOne).put(updateOne)
+module.exports = Router
+>>>>>>> handle curd on categories
