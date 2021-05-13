@@ -27,8 +27,10 @@ module.exports = Router;
 =======
 const express = require("express")
 const {createOne , getAll, deleteOne,updateOne} = require('../controllers/categoryController.js');
-
+const {loginRequired} = require("../middlewares/AuthMiddleware.js")
+const {isAdmin} = require("../middlewares/AdminMiddleware.js")
 Router = express.Router()
+<<<<<<< HEAD
 
 
 Router.route("/").post(createOne).get(getAll)
@@ -38,3 +40,8 @@ Router.route("/").post(createOne).get(getAll)
 Router.route("/:id").delete(deleteOne).put(updateOne)
 module.exports = Router
 >>>>>>> handle curd on categories
+=======
+Router.route("/").post(loginRequired,isAdmin,createOne).get(loginRequired,isAdmin,getAll)
+Router.route("/:id").delete(loginRequired,isAdmin,deleteOne).put(loginRequired,isAdmin,updateOne)
+module.exports = Router
+>>>>>>> add admin middleware
