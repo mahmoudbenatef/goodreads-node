@@ -23,6 +23,6 @@ Router.delete("/:id", (req, res, next) => {
 });
 
 //Rate Book.
-Router.post("/:bid/rate", book_controller.rateBook );
+Router.post("/:id/rate", bookController.rateBook );
 
 module.exports = Router;

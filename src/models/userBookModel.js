@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const shelves = require("../shelves");
+const shelves = require("../helper/shelves");
 
 const userBookSchema = new mongoose.Schema({
   book: {

@@ -3,7 +3,7 @@ const statusCode = require("../helper/statusCode");
 const bookValidator = require("../validators/bookValidator");
 const handler = require("../helper/controllersHelper");
 const UserBookModel = require("../models/userBookModel");
-const shelves = require("../shelves");
+const shelves = require("../helper/shelves");
 
 const getAllBooks = async (req, res) => {
   // get all books
@@ -106,7 +106,7 @@ async function updateBookAvgRating(bookId) {
 const rateBook = async (request, response) => {
   try {
     const userId = request.body.user;
-    const bookId = request.params.bid;
+    const bookId = request.params.id;
     const rating = request.body.rating;
     const book = await UserBookModel.findOneAndUpdate(
       {
@@ -118,7 +118,7 @@ const rateBook = async (request, response) => {
       },
       { useFindAndModify: false }
     );
-    if (book) response.sendStatus(200);
+    if (book) response.sendStatus(statusCode.Success);
     else {
       const userBookInstance = new UserBookModel({
         book: bookId,
@@ -127,11 +127,11 @@ const rateBook = async (request, response) => {
         shelf: shelves.READ,
       });
       const userBookDoc = await userBookInstance.save();
-      response.status(200).json(userBookDoc);
+      response.status(statusCode.Success).json(userBookDoc);
     }
     updateBookAvgRating(bookId);
   } catch (err) {
-    return response.status(500).json(err);
+    return response.status(statusCode.ServerError).json(err);
   }
 };
 
