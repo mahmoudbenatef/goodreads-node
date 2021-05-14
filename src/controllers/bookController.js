@@ -26,13 +26,14 @@ const getBookById = async (req, res, next) => {
 const createBook = (req, res, next) => {
   const data = req.body;
   if (!data) handler.handelEmptyData(res);
-  bookValidator.validateData(data, (err) => {
+  // validate the data before create a new book
+  bookValidator.validateData({ ...data, image: req.file.path }, async (err) => {
     if (err) return next(err);
     try {
-      const newBook = bookModel.create({
-        ...data,
-      });
-      res.status(statusCode.Created).end();
+      // craete a new book
+      const newBook = new bookModel({ ...data, image: req.file.path });
+      await newBook.save();
+      res.status(statusCode.Created).json(newBook);
     } catch (error) {
       next(error);
     }
@@ -46,7 +47,8 @@ const updateBook = (req, res) => {
     if (err) return next(err);
     try {
       const updatedBook = await bookModel.findByIdAndUpdate(
-        { _id: req.params.id, },{ ...data,}
+        { _id: req.params.id },
+        { ...data }
       );
       res.status(statusCode.NoContent).end();
     } catch (error) {
@@ -68,7 +70,8 @@ const deleteBook = async (req, res, next) => {
 
 async function updateBookAvgRating(bookId) {
   const ratings = await UserBookModel.find({
-    book: bookId, rating: { $exists: true, },
+    book: bookId,
+    rating: { $exists: true },
   });
   const avgRating =
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;

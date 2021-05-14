@@ -23,7 +23,6 @@ const userRouter = require("./src/routes/userRoute");
 const authorRouter = require("./src/routes/authorRoute");
 const bookRouter = require("./src/routes/bookRoute");
 const categoryRouter = require("./src/routes/categoryRoute");
-
 app.use(express.json());
 app.use(cors());
 app.use(function (req, res, next) {
@@ -46,6 +45,8 @@ app.use(function (req, res, next) {
     next();
   }
 });
+
+// routes
 app.use("/users", userRouter);
 app.use("/authors", authorRouter);
 app.use("/books", bookRouter);
