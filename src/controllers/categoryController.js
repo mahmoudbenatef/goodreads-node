@@ -28,20 +28,19 @@ const updateOne =  async (req, res) => {
   console.log(req.body);
   console.log(req.params.id);
   try{
-    const category = await CategoryModel.find(  { label:req.body.label})   
-      .lean()
-    .exec() 
+    const category = await CategoryModel.find(  { label:req.body.label}) .lean()  .exec() 
     if(category.length >0)
     {
       console.log("here")
       return res.status(500).json({errors:{label:{message:"category is unique"}}}) 
     }
 
-   const test = await CategoryModel.findOneAndUpdate(
+   const updated = await CategoryModel.findOneAndUpdate(
       { _id:req.params.id},
       {...req.body},
-  )
-   res.status(201).json({'data':test})
+      {new:true} // return the new updated
+    ).lean() .exec() 
+   res.status(201).json({'data':updated})
   } 
   catch (err){
 
@@ -53,9 +52,8 @@ const updateOne =  async (req, res) => {
 
   const getAll = async(req,res)=>{
     try{
-      const categories = await CategoryModel.find({})
-      // .lean()
-      // .exec() 
+      const categories = await CategoryModel.find({}).lean() .exec() 
+   
       res.status(201).json({ data: categories })
     }
     catch(err){
