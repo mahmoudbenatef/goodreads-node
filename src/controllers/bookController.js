@@ -118,7 +118,7 @@ const rateBook = async (request, response) => {
 };
 
 async function removeBookFromShelf({ bookId, userId }) {
-  await UserBookModel.findOneAndDelete({ book: bookId, user: userId });
+  return await UserBookModel.findOneAndDelete({ book: bookId, user: userId });
 }
 
 async function addBookToShelf({ bookId, userId, shelf }) {
@@ -148,12 +148,11 @@ const shelveBook = async (request, response) => {
     if (bookShelf.shelf === 0) removeBookFromShelf(bookShelf);
     else {
       const book = await updateBookShelf(bookShelf);
-      if (book) response.sendStatus(statusCode.Success);
-      else addBookToShelf(bookShelf);
+      if (!book) addBookToShelf(bookShelf);
     }
-    response.status(statusCode.Success);
+    return response.sendStatus(statusCode.Success);
   } catch (err) {
-    return response.status(statusCode.ServerError).json(err);
+    return response.sendStatus(statusCode.ServerError).json(err);
   }
 };
 
