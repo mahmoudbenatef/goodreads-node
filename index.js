@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jsonwebtoken = require("jsonwebtoken");
-<<<<<<< HEAD
 const statusCode = require("./src/helper/statusCode");
 const cors = require("cors");
 const port = 3001;
@@ -12,7 +11,7 @@ app.use("/public", express.static("public"));
 mongoose.connect(
   // process.env.MONGO_CONNECTION_STRING+"/goodreads"||
   "mongodb://localhost:27017/goodreads",
-  { useNewUrlParser: true, useUnifiedTopology: true },
+  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true },
   (err) => {
     if (err) {
       console.log("falied to connect mongo");
@@ -24,28 +23,6 @@ const userRouter = require("./src/routes/userRoute");
 const authorRouter = require("./src/routes/authorRoute");
 const bookRouter = require("./src/routes/bookRoute");
 const categoryRouter = require("./src/routes/categoryRoute");
-=======
-const cors = require('cors')
-const port = 3000;
-const app = express()
-let categoryRouter = require("./src/routes/categoryRoute")
-const userRouter    = require("./src/routes/userRoute")
-
-
-app.use('/public',express.static('public'));
-
-mongoose.connect(
-    process.env.MONGO_CONNECTION_STRING+"/goodreads"|| 
-    "mongodb://localhost:27017/goodreads",{useNewUrlParser:true,useUnifiedTopology:true ,useCreateIndex:true, useFindAndModify:false},(err)=>{
-    if (err ) 
-    {
-        console.log("falied to connect mongo")
-        console.log(process.env.MONGODB_URI, "monkooooo")
-    }
-    else
-        console.log("connected successfully to mongo")
-})
->>>>>>> handle curd on categories
 
 app.use(express.json());
 app.use(cors());
@@ -77,28 +54,12 @@ app.use("/category", categoryRouter);
 app.get("/", (req, res) => {
   res.end("hello at home page atef");
 });
-<<<<<<< HEAD
 //     .post(userHandlers.register);
-app.listen(process.env.PORT || port, (err) => {
+app.listen( process.env.PORT 
+  || port, (err) => {
   if (err) console.log("error in connecting");
   else console.log("connected successfully on port " + port);
 });
-=======
-
-app.use("/users", userRouter)
-app.use("/category",categoryRouter)
-
-app.get('/',(req,res)=>{
-    res.end("hello at home page atef")
-})
-
-
-app.listen(process.env.PORT ||port,(err)=>{
-    if (err) console.log("error in connecting")
-    else
-        console.log("connected successfully on port "+port)
-})
->>>>>>> handle curd on categories
 
 // app.use(express.static('public'));
 
