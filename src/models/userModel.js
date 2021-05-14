@@ -46,7 +46,7 @@ UserScheme.methods.comparePassword = function (password, hash_password) {
   try {
     return bcrypt.compareSync(password, this.password);
   } catch (err) {
-    console.log(err);
+    console.log("a7aaaaaaaaaaaaaaaaaaaa");
   }
 };
 
