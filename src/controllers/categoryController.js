@@ -68,7 +68,7 @@ const getPopular = async (req, res) => {
       { $unset: "books" },
     ]);
     const populatedCategories = await CategoryModel.populate(categories, {path: '_id'});
-    res.status(201).json(populatedCategories);
+    res.status(200).json(populatedCategories);
   } catch (err) {
     res.status(500).json(err);
   }

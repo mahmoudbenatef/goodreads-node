@@ -106,16 +106,14 @@ async function updateBookAvgRating(bookId) {
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
   const book = await bookModel.findOneAndUpdate(
     { _id: bookId },
-    { avgRating: avgRating },
-    { useFindAndModify: false }
+    { avgRating: avgRating }
   );
 }
 
 async function updateExistingRating({ userId, bookId, rating }) {
   return await UserBookModel.findOneAndUpdate(
     { book: bookId, user: userId },
-    { rating: rating },
-    { useFindAndModify: false }
+    { rating: rating }
   );
 }
 
@@ -165,8 +163,7 @@ async function addBookToShelf({ bookId, userId, shelf }) {
 async function updateBookShelf({ bookId, userId, shelf }) {
   return await UserBookModel.findOneAndUpdate(
     { book: bookId, user: userId },
-    { shelf: shelf },
-    { useFindAndModify: false }
+    { shelf: shelf }
   );
 }
 
@@ -188,6 +185,15 @@ const shelveBook = async (request, response) => {
   }
 };
 
+const getPopular = async (request, response) => {
+  try {
+    const popularBooks = await bookModel.find({}).sort([['avgRating', -1]]).limit(6).populate('author',["firstname","lastname"]).populate('category').lean();
+    return response.status(statusCode.Success).json(popularBooks);
+  } catch (err) {
+    return response.sendStatus(statusCode.ServerError).json(err);
+  }
+};
+
 module.exports = {
   getAllBooks,
   getBookById,
@@ -196,4 +202,5 @@ module.exports = {
   updateBook,
   rateBook,
   shelveBook,
+  getPopular
 };
