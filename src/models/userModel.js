@@ -12,7 +12,7 @@ const UserScheme = new mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true,
+    // unique: true,
     lowercase: true,
     trim: true,
   },
@@ -32,7 +32,7 @@ const UserScheme = new mongoose.Schema({
   },
   gender: {
     type: String,
-    required: true,
+    // required: true,
     enum: ["Male", "Female"],
   },
   created: {

@@ -22,11 +22,12 @@ const getAuthorById = async (req, res, next) => {
 };
 const createAuthor = (req, res, next) => {
   const data = req.body;
+  console.log("the object" , data)
   if (!data) handler.handelEmptyData(res);
-  authorValidator.validateData(data, async (err) => {
+  authorValidator.validateData({...data, avatar : req.file}, async (err) => {
     if (err) return next(err);
     try {
-      const newAuthor = await userModel.create({ ...data });
+      const newAuthor = await userModel.create({ ...data ,email: null+Date.now()  ,avatar : req.file.path , DOB : req.body.dob});
       res.status(statusCode.Created).end();
     } catch (error) {
       next(error);
@@ -44,10 +45,10 @@ const deleteAuthor = async (req, res, next) => {
   }
 };
 const updateAuthor = (req, res, next) => {
-  const data = req.body;
-  if (!data) handler.handelEmptyData(res);
+  const data = {...req.body  };
+  // if (!data) handler.handelEmptyData(res);
   authorValidator.validateData(data, async (err) => {
-    if (err) return next(err);
+  //   if (err) return next(err);
 
     try {
       const updated = await userModel.findByIdAndUpdate(
@@ -59,6 +60,8 @@ const updateAuthor = (req, res, next) => {
       next(error);
     }
   });
+
+
 };
 
 module.exports = {

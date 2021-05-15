@@ -10,10 +10,10 @@ const validateData = (data, callBackFunction) => {
     errors["firstname"] = validationErrorMessages.firstname;
   if (!lastname || typeof lastname !== "string")
     errors["lastname"] = validationErrorMessages.lastname;
-  if (!gender || typeof gender !== "string")
-    errors["gender"] = validationErrorMessages.gender;
-  if (!dob) errors["dob"] = validationErrorMessages.dob;
-  if (!avatar) errors["avatar"] = validationErrorMessages.avatar;
+  // if (!gender || typeof gender !== "string")
+  //   errors["gender"] = validationErrorMessages.gender;
+  //  if (!dob) errors["dob"] = validationErrorMessages.DOB;
+   if (!avatar) errors["avatar"] = validationErrorMessages.avatar;
   if (!role || role !== "author") {
     errors["role"] = validationErrorMessages.role;
   }
