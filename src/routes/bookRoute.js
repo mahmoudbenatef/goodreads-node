@@ -26,7 +26,7 @@ Router.post("/", upload.single("image"), (req, res, next) => {
   bookController.createBook(req, res, next);
 });
 
-Router.patch("/:id", (req, res, next) => {
+Router.patch("/:id", upload.single("image"), (req, res, next) => {
   bookController.updateBook(req, res, next);
 });
 
