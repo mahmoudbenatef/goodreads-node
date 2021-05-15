@@ -6,9 +6,14 @@ const UserBookModel = require("../models/userBookModel");
 const shelves = require("../helper/shelves");
 
 const getAllBooks = async (req, res) => {
-  const allBooks = await bookModel.find({});
-  if (allBooks.length > 0) return res.status(statusCode.Success).json(allBooks);
-  return res.status(statusCode.NoContent).end();
+  // get all books
+  const allBooks = await bookModel
+    .find({})
+    .populate("author")
+    .populate("category")
+    .exec();
+  if (allBooks.length > 0) return res.status(statusCode.Success).json(allBooks); // collection has data
+  return res.status(statusCode.NoContent).end(); // collection is empty
 };
 
 const getBookById = async (req, res, next) => {
@@ -24,31 +29,57 @@ const getBookById = async (req, res, next) => {
 };
 
 const createBook = (req, res, next) => {
-  const data = req.body;
+  let data = req.body;
+
+  // replace the field image with the path
+  data = {
+    ...data,
+    image: req.file.path,
+  };
+
+  // function gard
   if (!data) handler.handelEmptyData(res);
-  bookValidator.validateData(data, (err) => {
+
+  // validate the data before create a new book
+  bookValidator.validateData({ ...data }, async (err) => {
     if (err) return next(err);
     try {
-      const newBook = bookModel.create({
-        ...data,
-      });
-      res.status(statusCode.Created).end();
+      // craete a new book
+      let newBook = new bookModel({ ...data });
+      newBook = await (await newBook.save())
+        .populate("author")
+        .populate("category")
+        .execPopulate();
+      res.status(statusCode.Created).json(newBook);
     } catch (error) {
       next(error);
     }
   });
 };
 
-const updateBook = (req, res) => {
-  const data = req.body;
+const updateBook = (req, res, next) => {
+  let data = req.body;
+
+  // replace the field image with the path
+  data = {
+    ...data,
+    image: req.file.path,
+  };
+
+  // function gard
   if (!data) handler.handelEmptyData(res);
-  bookValidator.validateData(data, async (err) => {
+
+  //validate the data before update it
+  bookValidator.validateData({ ...data }, async (err) => {
     if (err) return next(err);
     try {
-      const updatedBook = await bookModel.findByIdAndUpdate(
-        { _id: req.params.id, },{ ...data,}
-      );
-      res.status(statusCode.NoContent).end();
+      // update the book with new data
+      const updatedBook = await bookModel
+        .findByIdAndUpdate({ _id: req.params.id }, { ...data }, { new: true })
+        .populate("author")
+        .populate("category")
+        .exec();
+      res.status(statusCode.Success).json(updatedBook);
     } catch (error) {
       next(error);
     }
@@ -68,7 +99,8 @@ const deleteBook = async (req, res, next) => {
 
 async function updateBookAvgRating(bookId) {
   const ratings = await UserBookModel.find({
-    book: bookId, rating: { $exists: true, },
+    book: bookId,
+    rating: { $exists: true },
   });
   const avgRating =
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
