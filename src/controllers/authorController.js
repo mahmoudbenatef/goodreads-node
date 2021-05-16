@@ -69,6 +69,7 @@ const deleteAuthor = async (req, res, next) => {
 const updateAuthor = (req, res, next) => {
   let fakeAVA ; 
   const data = {...req.body  };
+
     if (!data) handler.handelEmptyData(res);
     if (!data.avatar)
     {
