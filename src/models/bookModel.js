@@ -13,6 +13,7 @@ const bookSchema = new mongoose.Schema({
   description: {
     type: String,
     maxLength: 2000,
+    required: true,
     trim: true,
   },
   category: {
@@ -33,5 +34,9 @@ const bookSchema = new mongoose.Schema({
   },
 });
 
+// populate the author and cateogy to use it with pagination
+bookSchema.pre("find", function () {
+  this.populate("author").populate("category");
+});
 const BookModel = mongoose.model("Book", bookSchema);
 module.exports = BookModel;

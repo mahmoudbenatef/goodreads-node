@@ -22,7 +22,10 @@ Router.get("/:id", (req, res, next) => {
 });
 
 Router.post("/", upload.single("avatar"), (req, res, next) => {
-  authorController.createAuthor(req, res, next);
+  console.log("my request  file ", req.file)
+
+    console.log("my request ", req.body)
+   authorController.createAuthor(req, res, next);
 });
 
 Router.patch("/:id", upload.single("avatar"), (req, res, next) => {

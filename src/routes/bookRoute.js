@@ -1,20 +1,10 @@
 const express = require("express");
 const Router = express.Router();
 const bookController = require("../controllers/bookController");
-
-const multer = require("multer");
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-var upload = multer({ storage: storage });
-
-Router.get("/", (req, res, next) => {
+const { upload } = require("../middlewares/MulterMiddleware");
+const paginateMode = require("../middlewares/paginateModel");
+const BookModel = require("../models/bookModel");
+Router.get("/", paginateMode(BookModel), (req, res, next) => {
   bookController.getAllBooks(req, res, next);
 });
 
