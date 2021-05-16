@@ -1,16 +1,18 @@
 const paginateMode = (model) => {
   return async (req, res, next) => {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
+    let page = parseInt(req.query.page);
+    let limit = parseInt(req.query.limit);
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
+
+    const numberOfDocument = await model.countDocuments().exec();
 
     // object to carry the pagination result
     const result = {};
 
     // set the next page
-    if (endIndex < (await model.countDocuments().exec())) {
+    if (endIndex < numberOfDocument) {
       result.next = {
         page: page + 1,
         limit: limit,
@@ -24,6 +26,9 @@ const paginateMode = (model) => {
         limit: limit,
       };
     }
+
+    // set all number of pages
+    if (limit) result.count = Math.ceil(numberOfDocument / limit);
 
     // getting the data base on the model
     try {
