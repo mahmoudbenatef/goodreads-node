@@ -7,12 +7,9 @@ const shelves = require("../helper/shelves");
 
 const getAllBooks = async (req, res) => {
   // get all books
-  const allBooks = await bookModel
-    .find({})
-    .populate("author")
-    .populate("category")
-    .exec();
-  if (allBooks.length > 0) return res.status(statusCode.Success).json(allBooks); // collection has data
+
+  if (res.paginatedResult.data.length > 0)
+    return res.status(statusCode.Success).json(res.paginatedResult); // collection has data
   return res.status(statusCode.NoContent).end(); // collection is empty
 };
 
