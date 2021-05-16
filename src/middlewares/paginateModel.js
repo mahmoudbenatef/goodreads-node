@@ -2,12 +2,12 @@ const paginateMode = (model) => {
   return async (req, res, next) => {
     let page = parseInt(req.query.page);
     let limit = parseInt(req.query.limit);
-
+  
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
     const numberOfDocument = await model.countDocuments().exec();
-
+const test = await model.find({})
     // object to carry the pagination result
     const result = {};
 
@@ -32,8 +32,8 @@ const paginateMode = (model) => {
 
     // getting the data base on the model
     try {
-      result.data = await model.find().limit(limit).skip(startIndex).exec();
-      res.paginatedResult = result;
+      result.data = await model.find({}).limit(limit).skip(startIndex).exec();
+      req.paginatedResult = result;
       next();
     } catch (error) {
       res.status(500).json(error.messages);
