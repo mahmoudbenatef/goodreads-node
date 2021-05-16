@@ -223,7 +223,7 @@ const getPopularAuthors = async (request, response) => {
         }
       }
     ]);
-    authors = await UserModel.populate(authors, {path: 'author', select: { 'firstname': 1, 'lastname': 1}});
+    authors = await UserModel.populate(authors, {path: 'author', select: { 'firstname': 1, 'lastname': 1 , 'avatar': 1}});
 
     return response.status(statusCode.Success).json(authors);
   } catch (err) {
