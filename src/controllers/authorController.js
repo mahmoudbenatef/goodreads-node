@@ -6,10 +6,10 @@ const fs = require('fs')
 
 const getAllAuthors = async (req, res, next) => {
   const page = parseInt(req.query.page) || 0 
-    const Page_Size = 2 
+    const Page_Size =parseInt(req.query.limit) ||  2 
     const total = await userModel.countDocuments({ role: "author" })
   const allAuthors = await userModel.find({ role: "author" })
-  .limit(2)
+  .limit(Page_Size)
   .skip(page * Page_Size)
   if (allAuthors.length > 0)
   {
@@ -49,6 +49,7 @@ const createAuthor = (req, res, next) => {
 };
 const deleteAuthor = async (req, res, next) => {
   const authorId = req.params.id;
+
   if (!authorId) handler.handelEmptyData(res);
   const imagePath = await userModel.find({ _id: authorId })
 
