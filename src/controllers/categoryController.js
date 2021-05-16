@@ -54,7 +54,7 @@ const updateOne =  async (req, res) => {
     try{
       const categories = await CategoryModel.find({}).lean() .exec() 
    
-      res.status(201).json({ data: categories })
+      res.status(200).json({ data: categories })
     }
     catch(err){
       res.status(500).json(err)

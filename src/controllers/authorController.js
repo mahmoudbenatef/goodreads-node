@@ -67,9 +67,22 @@ const deleteAuthor = async (req, res, next) => {
   }
 };
 const updateAuthor = (req, res, next) => {
+  let fakeAVA ; 
   const data = {...req.body  };
-   if (!data) handler.handelEmptyData(res);
-  authorValidator.validateData(data, async (err) => {
+    if (!data) handler.handelEmptyData(res);
+    if (!data.avatar)
+    {
+
+       fakeAVA = {...data , avatar : "fake"}
+
+    }else {
+
+      fakeAVA   = {...req.body  };
+
+    }
+
+
+  authorValidator.validateData(fakeAVA, async (err) => {
     if (err) return next(err);
 
     try {
