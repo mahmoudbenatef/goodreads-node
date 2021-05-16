@@ -2,11 +2,24 @@ const userModel = require("../models/userModel.js");
 const statusCode = require("../helper/statusCode");
 const handler = require("../helper/controllersHelper");
 const authorValidator = require("../validators/authorValidator");
+const fs = require('fs')
 
 const getAllAuthors = async (req, res, next) => {
-  const allAuthors = await userModel.find({ role: "author" });
+  const page = parseInt(req.query.page) || 0 
+    const Page_Size = 2 
+    const total = await userModel.countDocuments({ role: "author" })
+  const allAuthors = await userModel.find({ role: "author" })
+  .limit(2)
+  .skip(page * Page_Size)
   if (allAuthors.length > 0)
-    return res.status(statusCode.Success).json(allAuthors);
+  {
+    return res.status(statusCode.Success).json(
+      {     
+       totalPages : Math.ceil(total / Page_Size) , 
+       allAuthors
+       });
+  }
+  
   return res.status(statusCode.NoContent).end();
 };
 const getAuthorById = async (req, res, next) => {
@@ -37,18 +50,41 @@ const createAuthor = (req, res, next) => {
 const deleteAuthor = async (req, res, next) => {
   const authorId = req.params.id;
   if (!authorId) handler.handelEmptyData(res);
+  const imagePath = await userModel.find({ _id: authorId })
+
+  console.log("imagePath",imagePath[0].avatar)
+
   try {
     const result = await userModel.findByIdAndDelete({ _id: authorId });
     res.status(statusCode.NoContent).end();
+      fs.unlink(imagePath[0].avatar , (error)=>{
+
+          console.log(error)
+
+      })
   } catch (error) {
     next(error);
   }
 };
 const updateAuthor = (req, res, next) => {
+  let fakeAVA ; 
   const data = {...req.body  };
-   if (!data) handler.handelEmptyData(res);
-  authorValidator.validateData(data, async (err) => {
-     if (err) return next(err);
+
+    if (!data) handler.handelEmptyData(res);
+    if (!data.avatar)
+    {
+
+       fakeAVA = {...data , avatar : "fake"}
+
+    }else {
+
+      fakeAVA   = {...req.body  };
+
+    }
+
+
+  authorValidator.validateData(fakeAVA, async (err) => {
+    if (err) return next(err);
 
     try {
       const updated = await userModel.findByIdAndUpdate(
