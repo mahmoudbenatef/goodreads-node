@@ -59,16 +59,21 @@ const getAll = async (req, res) => {
   }
 };
 
-const getPopular = async (req, res) => {
+const getPopularCategories = async (req, res) => {
   try {
-    const categories = await BookModel.aggregate([
+    let categories = await BookModel.aggregate([
       { $group: { _id: "$category", books: { $sum: 1 } } },
       { $sort: { books: -1 } },
       { $limit: 6 },
       { $unset: "books" },
+      { $project: {
+        _id: 0,
+        category: "$_id",
+        }
+      }
     ]);
-    const populatedCategories = await CategoryModel.populate(categories, {path: '_id'});
-    res.status(200).json(populatedCategories);
+    categories = await CategoryModel.populate(categories, {path: 'category'});
+    res.status(200).json(categories);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -79,5 +84,5 @@ module.exports = {
   getAll,
   deleteOne,
   updateOne,
-  getPopular,
+  getPopularCategories,
 };
