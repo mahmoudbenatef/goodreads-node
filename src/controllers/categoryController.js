@@ -49,13 +49,10 @@ const updateOne = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  try {
-    const categories = await CategoryModel.find({}).lean().exec();
+  if (req.paginatedResult.data.length > 0)
+  return res.status(200).json(req.paginatedResult); // collection has data
+return res.status(500).end(); // collection is empty
 
-    res.status(200).json({ data: categories });
-  } catch (err) {
-    res.status(500).json(err);
-  }
 };
 
 module.exports = {

@@ -7,9 +7,8 @@ const shelves = require("../helper/shelves");
 
 const getAllBooks = async (req, res) => {
   // get all books
-
-  if (res.paginatedResult.data.length > 0)
-    return res.status(statusCode.Success).json(res.paginatedResult); // collection has data
+  if (req.paginatedResult.data.length > 0)
+    return res.status(statusCode.Success).json(req.paginatedResult); // collection has data
   return res.status(statusCode.NoContent).end(); // collection is empty
 };
 
@@ -58,11 +57,13 @@ const updateBook = (req, res, next) => {
   let data = req.body;
 
   // replace the field image with the path
+  if(req.file.path)
+  {
   data = {
     ...data,
     image: req.file.path,
   };
-
+}
   // function gard
   if (!data) handler.handelEmptyData(res);
 
