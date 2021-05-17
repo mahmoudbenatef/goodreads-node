@@ -9,6 +9,7 @@ const userRouter = require("./src/routes/userRoute");
 const authorRouter = require("./src/routes/authorRoute");
 const bookRouter = require("./src/routes/bookRoute");
 const categoryRouter = require("./src/routes/categoryRoute");
+const userBooksRouter = require("./src/routes/userBooksRoute");
 var userHandlers = require("./src/controllers/userController.js");
 const generalRouter = require("./src/routes/generalRoute");
 
@@ -60,6 +61,7 @@ app.use("/users", userRouter);
 app.use("/authors", authorRouter);
 app.use("/books", bookRouter);
 app.use("/category", categoryRouter);
+app.use("/userBooks", userBooksRouter)
 app.use("/", generalRouter);
 
 app.get("/", (req, res) => {
