@@ -4,6 +4,8 @@ const bookValidator = require("../validators/bookValidator");
 const handler = require("../helper/controllersHelper");
 const UserBookModel = require("../models/userBookModel");
 const shelves = require("../helper/shelves");
+const UserModel = require("../models/userModel")
+const CategoryModel = require("../models/categoryModel.js");
 
 const getAllBooks = async (req, res) => {
   // get all books
@@ -104,16 +106,14 @@ async function updateBookAvgRating(bookId) {
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
   const book = await bookModel.findOneAndUpdate(
     { _id: bookId },
-    { avgRating: avgRating },
-    { useFindAndModify: false }
+    { avgRating: avgRating }
   );
 }
 
 async function updateExistingRating({ userId, bookId, rating }) {
   return await UserBookModel.findOneAndUpdate(
     { book: bookId, user: userId },
-    { rating: rating },
-    { useFindAndModify: false }
+    { rating: rating }
   );
 }
 
@@ -163,8 +163,7 @@ async function addBookToShelf({ bookId, userId, shelf }) {
 async function updateBookShelf({ bookId, userId, shelf }) {
   return await UserBookModel.findOneAndUpdate(
     { book: bookId, user: userId },
-    { shelf: shelf },
-    { useFindAndModify: false }
+    { shelf: shelf }
   );
 }
 
@@ -186,6 +185,50 @@ const shelveBook = async (request, response) => {
   }
 };
 
+const getPopularBooks = async (request, response) => {
+  try {
+    let popularBooks = await UserBookModel.aggregate([
+      { $match: {rating: { $exists: true }}},
+      { $group: { _id: "$book", books: { $sum: 1 } } },
+      { $sort: { books: -1 } },
+      { $limit: 4 },
+      { $unset: "books" },
+      { $project: {
+        _id: 0,
+        book: "$_id",
+        }
+      }
+    ]);
+     popularBooks = await bookModel.populate(popularBooks, {path: 'book'});
+     popularBooks = await UserModel.populate(popularBooks, {path: 'book.author' , select: { 'firstname': 1, 'lastname': 1}});
+     popularBooks = await CategoryModel.populate(popularBooks, {path: 'book.category'});
+    return response.status(statusCode.Success).json(popularBooks);
+  } catch (err) {
+    return response.sendStatus(statusCode.ServerError).json(err);
+  }ccd
+};
+
+const getPopularAuthors = async (request, response) => {
+  try {
+     let authors = await bookModel.aggregate([
+      { $group: { _id: "$author", books: { $sum: 1 } } },
+      { $sort: { books: -1 } },
+      { $limit: 4 },
+      { $unset: "books" },
+      { $project: {
+        _id: 0,
+        author: "$_id",
+        }
+      }
+    ]);
+    authors = await UserModel.populate(authors, {path: 'author', select: { 'firstname': 1, 'lastname': 1 , 'avatar': 1}});
+
+    return response.status(statusCode.Success).json(authors);
+  } catch (err) {
+    return response.sendStatus(statusCode.ServerError).json(err);
+  }ccd
+};
+
 module.exports = {
   getAllBooks,
   getBookById,
@@ -194,4 +237,6 @@ module.exports = {
   updateBook,
   rateBook,
   shelveBook,
+  getPopularBooks,
+  getPopularAuthors
 };

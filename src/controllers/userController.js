@@ -40,9 +40,6 @@ const sign_in = function(req, res) {
     });
 };
 
-
-
-
 const users= async function (req,res){
      
             try {
