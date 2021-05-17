@@ -49,16 +49,6 @@ const updateOne = async (req, res) => {
   res.status(200).end();
 };
 
-const getAll = async (req, res) => {
-  try {
-    const categories = await CategoryModel.find({}).lean().exec();
-
-    res.status(201).json({ data: categories });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-};
-
 const getPopularCategories = async (req, res) => {
   try {
     let categories = await BookModel.aggregate([
@@ -77,6 +67,13 @@ const getPopularCategories = async (req, res) => {
   } catch (err) {
     res.status(500).json(err);
   }
+}
+
+const getAll = async (req, res) => {
+  if (req.paginatedResult.data.length > 0)
+  return res.status(200).json(req.paginatedResult); // collection has data
+return res.status(500).end(); // collection is empty
+
 };
 
 module.exports = {
@@ -85,4 +82,4 @@ module.exports = {
   deleteOne,
   updateOne,
   getPopularCategories,
-};
+}

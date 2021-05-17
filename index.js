@@ -5,12 +5,25 @@ const statusCode = require("./src/helper/statusCode");
 const cors = require("cors");
 const port = 3001;
 const app = express();
+const userRouter = require("./src/routes/userRoute");
+const authorRouter = require("./src/routes/authorRoute");
+const bookRouter = require("./src/routes/bookRoute");
+const categoryRouter = require("./src/routes/categoryRoute");
+var userHandlers = require("./src/controllers/userController.js");
+const generalRouter = require("./src/routes/generalRoute");
+
+
 app.use("/public", express.static("public"));
 
 mongoose.connect(
   // process.env.MONGO_CONNECTION_STRING+"/goodreads"||
   "mongodb://localhost:27017/goodreads",
-  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true },
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  },
   (err) => {
     if (err) {
       console.log("falied to connect mongo");
@@ -18,11 +31,6 @@ mongoose.connect(
     } else console.log("connected successfully to mongo");
   }
 );
-const userRouter = require("./src/routes/userRoute");
-const authorRouter = require("./src/routes/authorRoute");
-const bookRouter = require("./src/routes/bookRoute");
-const categoryRouter = require("./src/routes/categoryRoute");
-const generalRouter = require("./src/routes/generalRoute");
 
 app.use(express.json());
 app.use(cors());
@@ -58,8 +66,7 @@ app.get("/", (req, res) => {
   res.end("hello at home page atef");
 });
 //     .post(userHandlers.register);
-app.listen( process.env.PORT 
-  || port, (err) => {
+app.listen(process.env.PORT || port, (err) => {
   if (err) console.log("error in connecting");
   else console.log("connected successfully on port " + port);
 });
