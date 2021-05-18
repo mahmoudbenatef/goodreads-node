@@ -27,5 +27,6 @@ Router.delete("/:id", (req, res, next) => {
 Router.post("/:id/rate", bookController.rateBook);
 
 Router.post("/:id/shelve", bookController.shelveBook);
+Router.post("/:id/review", bookController.reviewBook);
 
 module.exports = Router;

@@ -6,6 +6,7 @@ const UserBookModel = require("../models/userBookModel");
 const shelves = require("../helper/shelves");
 const UserModel = require("../models/userModel");
 const CategoryModel = require("../models/categoryModel.js");
+const userBookModel = require("../models/userBookModel");
 
 const getAllBooks = async (req, res) => {
   // get all books
@@ -18,8 +19,19 @@ const getBookById = async (req, res, next) => {
   const bookId = req.params.id;
   if (!bookId) handler.handelEmptyData(res);
   try {
-    const book = await bookModel.findById(bookId);
-    if (book) return res.status(statusCode.Success).json(book);
+    const book = await bookModel
+      .findById(bookId)
+      .populate("author")
+      .populate("category")
+      .exec();
+
+    // get all reviews, and populate the users inside them.
+    //  -> to attach its avatar,
+    let reviews = await userBookModel
+      .find({ book: bookId })
+      .populate("user")
+      .exec();
+    if (book) return res.status(statusCode.Success).json({ book, reviews });
     return res.status(statusCode.NoContent).end();
   } catch (error) {
     next(error);
@@ -154,6 +166,21 @@ const rateBook = async (request, response) => {
   }
 };
 
+// review book
+const reviewBook = async (req, res, next) => {
+  if (!req.body) return handler.handelEmptyData();
+  const { bookId, userId, review } = req.body;
+  try {
+    const updatedBook = await UserBookModel.findOneAndUpdate(
+      { book: bookId, user: userId },
+      { review: review }
+    );
+    return res.status(statusCode.Success).json(updatedBook);
+  } catch (error) {
+    next(error);
+  }
+};
+
 async function removeBookFromShelf({ bookId, userId }) {
   return await UserBookModel.findOneAndDelete({ book: bookId, user: userId });
 }
@@ -219,7 +246,6 @@ const getPopularBooks = async (request, response) => {
   } catch (err) {
     return response.sendStatus(statusCode.ServerError).json(err);
   }
-  ccd;
 };
 
 const getPopularAuthors = async (request, response) => {
@@ -245,7 +271,6 @@ const getPopularAuthors = async (request, response) => {
   } catch (err) {
     return response.sendStatus(statusCode.ServerError).json(err);
   }
-  ccd;
 };
 
 module.exports = {
@@ -258,4 +283,5 @@ module.exports = {
   shelveBook,
   getPopularBooks,
   getPopularAuthors,
+  reviewBook,
 };
