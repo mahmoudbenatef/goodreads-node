@@ -4,7 +4,7 @@ const bookValidator = require("../validators/bookValidator");
 const handler = require("../helper/controllersHelper");
 const UserBookModel = require("../models/userBookModel");
 const shelves = require("../helper/shelves");
-const UserModel = require("../models/userModel")
+const UserModel = require("../models/userModel");
 const CategoryModel = require("../models/categoryModel.js");
 
 const getAllBooks = async (req, res) => {
@@ -59,13 +59,12 @@ const updateBook = (req, res, next) => {
   let data = req.body;
 
   // replace the field image with the path
-  if(req.file.path)
-  {
-  data = {
-    ...data,
-    image: req.file.path,
-  };
-}
+  if (req.file.path) {
+    data = {
+      ...data,
+      image: req.file.path,
+    };
+  }
   // function gard
   if (!data) handler.handelEmptyData(res);
 
@@ -111,10 +110,18 @@ async function updateBookAvgRating(bookId) {
 }
 
 async function updateExistingRating({ userId, bookId, rating }) {
-  return await UserBookModel.findOneAndUpdate(
-    { book: bookId, user: userId },
-    { rating: rating }
-  );
+  let updatedRating;
+  if (rating == null)
+    updatedRating = await UserBookModel.findOneAndUpdate(
+      { book: bookId, user: userId },
+      { $unset: { rating: 1 } }
+    );
+  else
+    updatedRating = await UserBookModel.findOneAndUpdate(
+      { book: bookId, user: userId },
+      { rating: rating }
+    );
+  return updatedRating;
 }
 
 async function addNewRating({ bookId, userId, rating }) {
@@ -188,45 +195,57 @@ const shelveBook = async (request, response) => {
 const getPopularBooks = async (request, response) => {
   try {
     let popularBooks = await UserBookModel.aggregate([
-      { $match: {rating: { $exists: true }}},
+      { $match: { rating: { $exists: true } } },
       { $group: { _id: "$book", books: { $sum: 1 } } },
       { $sort: { books: -1 } },
       { $limit: 4 },
       { $unset: "books" },
-      { $project: {
-        _id: 0,
-        book: "$_id",
-        }
-      }
+      {
+        $project: {
+          _id: 0,
+          book: "$_id",
+        },
+      },
     ]);
-     popularBooks = await bookModel.populate(popularBooks, {path: 'book'});
-     popularBooks = await UserModel.populate(popularBooks, {path: 'book.author' , select: { 'firstname': 1, 'lastname': 1}});
-     popularBooks = await CategoryModel.populate(popularBooks, {path: 'book.category'});
+    popularBooks = await bookModel.populate(popularBooks, { path: "book" });
+    popularBooks = await UserModel.populate(popularBooks, {
+      path: "book.author",
+      select: { firstname: 1, lastname: 1 },
+    });
+    popularBooks = await CategoryModel.populate(popularBooks, {
+      path: "book.category",
+    });
     return response.status(statusCode.Success).json(popularBooks);
   } catch (err) {
     return response.sendStatus(statusCode.ServerError).json(err);
-  }ccd
+  }
+  ccd;
 };
 
 const getPopularAuthors = async (request, response) => {
   try {
-     let authors = await bookModel.aggregate([
+    let authors = await bookModel.aggregate([
       { $group: { _id: "$author", books: { $sum: 1 } } },
       { $sort: { books: -1 } },
       { $limit: 4 },
       { $unset: "books" },
-      { $project: {
-        _id: 0,
-        author: "$_id",
-        }
-      }
+      {
+        $project: {
+          _id: 0,
+          author: "$_id",
+        },
+      },
     ]);
-    authors = await UserModel.populate(authors, {path: 'author', select: { 'firstname': 1, 'lastname': 1 , 'avatar': 1}});
+    authors = await UserModel.populate(authors, {
+      path: "author",
+      select: { firstname: 1, lastname: 1, avatar: 1 },
+    });
 
     return response.status(statusCode.Success).json(authors);
   } catch (err) {
     return response.sendStatus(statusCode.ServerError).json(err);
-  }ccd
+  }
+  ccd;
 };
 
 module.exports = {
@@ -238,5 +257,5 @@ module.exports = {
   rateBook,
   shelveBook,
   getPopularBooks,
-  getPopularAuthors
+  getPopularAuthors,
 };
