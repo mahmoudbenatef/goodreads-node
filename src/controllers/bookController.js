@@ -25,11 +25,12 @@ const getBookById = async (req, res, next) => {
       .populate("category")
       .exec();
 
-    let reviews = await userBookModel.find({ book: bookId });
-    console.log(reviews);
-
     // get all reviews, and populate the users inside them.
     //  -> to attach its avatar,
+    let reviews = await userBookModel
+      .find({ book: bookId })
+      .populate("user")
+      .exec();
     if (book) return res.status(statusCode.Success).json({ book, reviews });
     return res.status(statusCode.NoContent).end();
   } catch (error) {
@@ -157,6 +158,21 @@ const rateBook = async (request, response) => {
   }
 };
 
+// review book
+const reviewBook = async (req, res, next) => {
+  if (!req.body) return handler.handelEmptyData();
+  const { bookId, userId, review } = req.body;
+  try {
+    const updatedBook = await UserBookModel.findOneAndUpdate(
+      { book: bookId, user: userId },
+      { review: review }
+    );
+    return res.status(statusCode.Success).json(updatedBook);
+  } catch (error) {
+    next(error);
+  }
+};
+
 async function removeBookFromShelf({ bookId, userId }) {
   return await UserBookModel.findOneAndDelete({ book: bookId, user: userId });
 }
@@ -260,4 +276,5 @@ module.exports = {
   shelveBook,
   getPopularBooks,
   getPopularAuthors,
+  reviewBook,
 };
