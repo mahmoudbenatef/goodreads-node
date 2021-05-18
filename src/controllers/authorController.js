@@ -13,6 +13,8 @@ const getAllAuthors = async (req, res, next) => {
   .skip(page * Page_Size)
   if (allAuthors.length > 0)
   {
+    console.log("12 data before send" , allAuthors)
+
     return res.status(statusCode.Success).json(
       {     
        totalPages : Math.ceil(total / Page_Size) , 
@@ -40,7 +42,11 @@ const createAuthor = (req, res, next) => {
   authorValidator.validateData({...data, avatar : req.file}, async (err) => {
     if (err) return next(err);
     try {
-      const newAuthor = await userModel.create({ ...data ,email: Date.now()  ,avatar : req.file.path , DOB : req.body.dob});
+      const newAuthor = await userModel.create({ ...data ,email: Date.now() 
+         ,avatar : req.file.path 
+
+         , DOB : req.body.dob ,
+        });
       res.status(statusCode.Created).end();
     } catch (error) {
       next(error);
