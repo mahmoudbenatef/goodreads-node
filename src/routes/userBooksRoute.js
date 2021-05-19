@@ -2,8 +2,10 @@ const express = require("express");
 // mergeParams to receved the parent params in the request object
 const Router = express.Router({ mergeParams: true });
 const userBooksController = require("../controllers/userBooksController");
+const paginateModel = require("../middlewares/paginateModel");
+const userBookModel = require("../models/userBookModel");
 
-Router.get("/", (req, res) => {
+Router.get("/", paginateModel(userBookModel) , (req, res) => {
   userBooksController.getAllBooks(req, res);
 });
 
