@@ -122,10 +122,18 @@ async function updateBookAvgRating(bookId) {
 }
 
 async function updateExistingRating({ userId, bookId, rating }) {
-  return await UserBookModel.findOneAndUpdate(
-    { book: bookId, user: userId },
-    { rating: rating }
-  );
+  let updatedRating;
+  if (rating == null)
+    updatedRating = await UserBookModel.findOneAndUpdate(
+      { book: bookId, user: userId },
+      { $unset: { rating: 1 } }
+    );
+  else
+    updatedRating = await UserBookModel.findOneAndUpdate(
+      { book: bookId, user: userId },
+      { rating: rating }
+    );
+  return updatedRating;
 }
 
 async function addNewRating({ bookId, userId, rating }) {
@@ -263,7 +271,6 @@ const getPopularAuthors = async (request, response) => {
   } catch (err) {
     return response.sendStatus(statusCode.ServerError).json(err);
   }
-  ccd;
 };
 
 module.exports = {
