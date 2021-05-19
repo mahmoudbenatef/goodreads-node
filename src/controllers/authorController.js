@@ -6,13 +6,29 @@ const fs = require('fs')
 
 const getAllAuthors = async (req, res, next) => {
   const page = parseInt(req.query.page) || 0 
-    const Page_Size = 2 
+    const Page_Size =parseInt(req.query.limit) ||  2 
     const total = await userModel.countDocuments({ role: "author" })
-  const allAuthors = await userModel.find({ role: "author" })
-  .limit(2)
+    let  allAuthors  ; 
+    if (!req.query.page ) 
+    {
+       allAuthors = await userModel.find({ role: "author" })
+      
+
+    }else
+    {
+      allAuthors = await userModel.find({ role: "author" })
+  .limit(Page_Size)
   .skip(page * Page_Size)
+
+
+    }
+  // const allAuthors = await userModel.find({ role: "author" })
+  // .limit(Page_Size)
+  // .skip(page * Page_Size)
   if (allAuthors.length > 0)
   {
+    console.log("12 data before send" , allAuthors)
+
     return res.status(statusCode.Success).json(
       {     
        totalPages : Math.ceil(total / Page_Size) , 
@@ -40,7 +56,11 @@ const createAuthor = (req, res, next) => {
   authorValidator.validateData({...data, avatar : req.file}, async (err) => {
     if (err) return next(err);
     try {
-      const newAuthor = await userModel.create({ ...data ,email: Date.now()  ,avatar : req.file.path , DOB : req.body.dob});
+      const newAuthor = await userModel.create({ ...data ,email: Date.now() 
+         ,avatar : req.file.path 
+
+         , DOB : req.body.dob ,
+        });
       res.status(statusCode.Created).end();
     } catch (error) {
       next(error);
@@ -49,6 +69,7 @@ const createAuthor = (req, res, next) => {
 };
 const deleteAuthor = async (req, res, next) => {
   const authorId = req.params.id;
+
   if (!authorId) handler.handelEmptyData(res);
   const imagePath = await userModel.find({ _id: authorId })
 

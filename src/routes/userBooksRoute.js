@@ -2,8 +2,10 @@ const express = require("express");
 // mergeParams to receved the parent params in the request object
 const Router = express.Router({ mergeParams: true });
 const userBooksController = require("../controllers/userBooksController");
+const paginateModel = require("../middlewares/paginateModel");
+const userBookModel = require("../models/userBookModel");
 
-Router.get("/", (req, res) => {
+Router.get("/", paginateModel(userBookModel) , (req, res) => {
   userBooksController.getAllBooks(req, res);
 });
 
@@ -22,5 +24,7 @@ Router.patch("/:id", (req, res) => {
 Router.delete("/:id", (req, res) => {
   userBooksController.deleteBook(req, res);
 });
+Router.get('/:bookId/user/:userId/shelve',(req,res,next)=>{console.log("halaaa")
+ next()},userBooksController.getBookShelve)
 
 module.exports = Router;

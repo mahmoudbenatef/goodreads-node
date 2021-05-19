@@ -5,10 +5,14 @@ const UserScheme = new mongoose.Schema({
   firstname: {
     type: String,
     required: true,
-  },
+    },
   lastname: {
     type: String,
     required: true,
+  },
+  description: {
+    type: String,
+    // required: true,
   },
   email: {
     type: String,
@@ -42,11 +46,10 @@ const UserScheme = new mongoose.Schema({
 });
 
 UserScheme.methods.comparePassword = function (password, hash_password) {
-  console.log("comparing");
   try {
     return bcrypt.compareSync(password, this.password);
   } catch (err) {
-    console.log("a7aaaaaaaaaaaaaaaaaaaa");
+    console.log(err);
   }
 };
 

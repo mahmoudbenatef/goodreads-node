@@ -4,6 +4,9 @@ const bookValidator = require("../validators/bookValidator");
 const handler = require("../helper/controllersHelper");
 const UserBookModel = require("../models/userBookModel");
 const shelves = require("../helper/shelves");
+const UserModel = require("../models/userModel");
+const CategoryModel = require("../models/categoryModel.js");
+const userBookModel = require("../models/userBookModel");
 
 const getAllBooks = async (req, res) => {
   // get all books
@@ -16,8 +19,19 @@ const getBookById = async (req, res, next) => {
   const bookId = req.params.id;
   if (!bookId) handler.handelEmptyData(res);
   try {
-    const book = await bookModel.findById(bookId);
-    if (book) return res.status(statusCode.Success).json(book);
+    const book = await bookModel
+      .findById(bookId)
+      .populate("author")
+      .populate("category")
+      .exec();
+
+    // get all reviews, and populate the users inside them.
+    //  -> to attach its avatar,
+    let reviews = await userBookModel
+      .find({ book: bookId })
+      .populate("user")
+      .exec();
+    if (book) return res.status(statusCode.Success).json({ book, reviews });
     return res.status(statusCode.NoContent).end();
   } catch (error) {
     next(error);
@@ -57,13 +71,12 @@ const updateBook = (req, res, next) => {
   let data = req.body;
 
   // replace the field image with the path
-  if(req.file.path)
-  {
-  data = {
-    ...data,
-    image: req.file.path,
-  };
-}
+  if (req.file.path) {
+    data = {
+      ...data,
+      image: req.file.path,
+    };
+  }
   // function gard
   if (!data) handler.handelEmptyData(res);
 
@@ -104,16 +117,14 @@ async function updateBookAvgRating(bookId) {
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
   const book = await bookModel.findOneAndUpdate(
     { _id: bookId },
-    { avgRating: avgRating },
-    { useFindAndModify: false }
+    { avgRating: avgRating }
   );
 }
 
 async function updateExistingRating({ userId, bookId, rating }) {
   return await UserBookModel.findOneAndUpdate(
     { book: bookId, user: userId },
-    { rating: rating },
-    { useFindAndModify: false }
+    { rating: rating }
   );
 }
 
@@ -147,6 +158,21 @@ const rateBook = async (request, response) => {
   }
 };
 
+// review book
+const reviewBook = async (req, res, next) => {
+  if (!req.body) return handler.handelEmptyData();
+  const { bookId, userId, review } = req.body;
+  try {
+    const updatedBook = await UserBookModel.findOneAndUpdate(
+      { book: bookId, user: userId },
+      { review: review }
+    );
+    return res.status(statusCode.Success).json(updatedBook);
+  } catch (error) {
+    next(error);
+  }
+};
+
 async function removeBookFromShelf({ bookId, userId }) {
   return await UserBookModel.findOneAndDelete({ book: bookId, user: userId });
 }
@@ -163,8 +189,7 @@ async function addBookToShelf({ bookId, userId, shelf }) {
 async function updateBookShelf({ bookId, userId, shelf }) {
   return await UserBookModel.findOneAndUpdate(
     { book: bookId, user: userId },
-    { shelf: shelf },
-    { useFindAndModify: false }
+    { shelf: shelf }
   );
 }
 
@@ -186,6 +211,61 @@ const shelveBook = async (request, response) => {
   }
 };
 
+const getPopularBooks = async (request, response) => {
+  try {
+    let popularBooks = await UserBookModel.aggregate([
+      { $match: { rating: { $exists: true } } },
+      { $group: { _id: "$book", books: { $sum: 1 } } },
+      { $sort: { books: -1 } },
+      { $limit: 4 },
+      { $unset: "books" },
+      {
+        $project: {
+          _id: 0,
+          book: "$_id",
+        },
+      },
+    ]);
+    popularBooks = await bookModel.populate(popularBooks, { path: "book" });
+    popularBooks = await UserModel.populate(popularBooks, {
+      path: "book.author",
+      select: { firstname: 1, lastname: 1 },
+    });
+    popularBooks = await CategoryModel.populate(popularBooks, {
+      path: "book.category",
+    });
+    return response.status(statusCode.Success).json(popularBooks);
+  } catch (err) {
+    return response.sendStatus(statusCode.ServerError).json(err);
+  }
+};
+
+const getPopularAuthors = async (request, response) => {
+  try {
+    let authors = await bookModel.aggregate([
+      { $group: { _id: "$author", books: { $sum: 1 } } },
+      { $sort: { books: -1 } },
+      { $limit: 4 },
+      { $unset: "books" },
+      {
+        $project: {
+          _id: 0,
+          author: "$_id",
+        },
+      },
+    ]);
+    authors = await UserModel.populate(authors, {
+      path: "author",
+      select: { firstname: 1, lastname: 1, avatar: 1 },
+    });
+
+    return response.status(statusCode.Success).json(authors);
+  } catch (err) {
+    return response.sendStatus(statusCode.ServerError).json(err);
+  }
+  ccd;
+};
+
 module.exports = {
   getAllBooks,
   getBookById,
@@ -194,4 +274,7 @@ module.exports = {
   updateBook,
   rateBook,
   shelveBook,
+  getPopularBooks,
+  getPopularAuthors,
+  reviewBook,
 };

@@ -9,7 +9,11 @@ const userRouter = require("./src/routes/userRoute");
 const authorRouter = require("./src/routes/authorRoute");
 const bookRouter = require("./src/routes/bookRoute");
 const categoryRouter = require("./src/routes/categoryRoute");
+const userBooksRouter = require("./src/routes/userBooksRoute");
 var userHandlers = require("./src/controllers/userController.js");
+const generalRouter = require("./src/routes/generalRoute");
+
+
 app.use("/public", express.static("public"));
 
 mongoose.connect(
@@ -57,6 +61,9 @@ app.use("/users", userRouter);
 app.use("/authors", authorRouter);
 app.use("/books", bookRouter);
 app.use("/category", categoryRouter);
+app.use("/userBooks", userBooksRouter)
+app.use("/", generalRouter);
+app.use("/user/:id/books", userBooksRouter);
 
 app.get("/", (req, res) => {
   res.end("hello at home page atef");
@@ -72,15 +79,12 @@ app.listen(process.env.PORT || port, (err) => {
 // error handler middleware
 app.use((err, req, res, next) => {
   console.log("**************ERROR****************** \n \n", err);
-  console.log("**************ERROR****************** \n \n");
-
   // error from mongoDB, but dose not work !!!!!
   if (err.name === "MongoError") {
     return res
       .status(statusCode.ServerError)
-      .json({ message: "some thing wronge happend" });
+      .json({ message: "some thing wrong happend" });
   }
-
   // error from validation
   if (err) return res.status(statusCode.BadRequest).json(err);
 });
