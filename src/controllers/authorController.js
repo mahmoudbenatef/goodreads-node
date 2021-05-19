@@ -42,6 +42,7 @@ const getAuthorById = async (req, res, next) => {
   const authorId = req.params.id;
   if (!authorId) handler.handelEmptyData(res);
   try {
+
     const author = await userModel.findById(authorId);
     if (author) return res.status(statusCode.Success).json(author);
     return res.status(statusCode.NoContent).end();
