@@ -5,7 +5,6 @@ const paginateMode = (model) => {
   
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-
     const numberOfDocument = await model.countDocuments().exec();
 const test = await model.find({})
     // object to carry the pagination result
@@ -31,8 +30,16 @@ const test = await model.find({})
     if (limit) result.count = Math.ceil(numberOfDocument / limit);
 
     // getting the data base on the model
+    
     try {
-      result.data = await model.find({}).limit(limit).skip(startIndex).exec();
+      if (req.params.id) {
+        if (req.query.filter == 0) {
+          result.data = await model.find({user: req.params.id}).lean().populate("book", "name avgRating image").lean().populate("author", "firstname lastname").limit(limit).skip(startIndex).exec();
+        }else{
+          result.data = await model.find({user: req.params.id, shelf: req.query.filter}).lean().populate("book", "name avgRating image").lean().populate("author", "firstname lastname").limit(limit).skip(startIndex).exec();
+        }
+      }else{
+      result.data = await model.find({}).limit(limit).skip(startIndex).exec();}
       req.paginatedResult = result;
       next();
     } catch (error) {
