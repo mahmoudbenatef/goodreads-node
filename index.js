@@ -63,6 +63,7 @@ app.use("/books", bookRouter);
 app.use("/category", categoryRouter);
 app.use("/userBooks", userBooksRouter)
 app.use("/", generalRouter);
+app.use("/user/:id/books", userBooksRouter);
 
 app.get("/", (req, res) => {
   res.end("hello at home page atef");
