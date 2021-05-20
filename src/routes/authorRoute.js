@@ -36,4 +36,7 @@ Router.delete("/:id", (req, res, next) => {
   authorController.deleteAuthor(req, res, next);
 });
 
+
+Router.get("/:id/books/:skip",  authorController.getAuthorBooks);
+
 module.exports = Router;

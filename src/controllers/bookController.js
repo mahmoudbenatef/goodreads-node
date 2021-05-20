@@ -115,10 +115,12 @@ async function updateBookAvgRating(bookId) {
   });
   const avgRating =
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
+  console.log("HIIIIIIII",ratings.length);
   const book = await bookModel.findOneAndUpdate(
     { _id: bookId },
-    { avgRating: avgRating }
+    { avgRating: avgRating , ratings : ratings.length}
   );
+  console.log(book);
 }
 
 async function updateExistingRating({ userId, bookId, rating }) {
