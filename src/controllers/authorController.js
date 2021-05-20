@@ -110,7 +110,7 @@ const updateAuthor = (req, res, next) => {
 const getAuthorBooks = async (req, res, next) => {
   try {
     const skip = req.params.skip;
-    const books = await bookModel.find({ author: req.params.id }).skip(+skip).limit(6).lean();
+    const books = await bookModel.find({ author: req.params.id }).skip(+skip).limit(6);
     return res.send(books);
   } catch (err) {
     console.log(err);

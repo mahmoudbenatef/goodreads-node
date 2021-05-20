@@ -17,7 +17,7 @@ const getBookShelve = async(req,res)=>{
   console.log("ana wslt hna",'bookID',);
   try{
   
-  const shelveStatus =  await  userBookModel.findOne({book:req.params.bookId, user:req.params.userId}).select({shelf:1})
+  const shelveStatus =  await  userBookModel.findOne({book:req.params.bookId, user:req.params.userId}).select({shelf:1,rating:1})
   console.log(shelveStatus);
   res.status(200).json({data:shelveStatus})
 }
