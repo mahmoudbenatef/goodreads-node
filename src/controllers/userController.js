@@ -12,7 +12,6 @@ const BookModel = require("../models/bookModel");
 const register = async function(req, res) {
 
     const userData = req.body
-    console.log(req.body)
     userData.hash_password = bcrypt.hashSync(req.body.password, 10);
 
     const userInstance = new UserModel({firstname:userData.firstname,email:userData.email

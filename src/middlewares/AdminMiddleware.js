@@ -11,8 +11,6 @@ const isAdmin = async function(req, res,next) {
             res.status(401).json({errors:{label:{message:"You are not admin"}}})
 
         }
-
-        console.log(user)
     }
     catch(e) {
         res.status(401).json({errors:{label:{message:"You are not admin"}}})

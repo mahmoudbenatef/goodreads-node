@@ -3,7 +3,6 @@ const CategoryModel = require("../models/categoryModel.js");
 const BookModel = require("../models/bookModel.js");
 
 const createOne = async (req, res) => {
-  console.log(req.body);
   try {
     const doc = await new CategoryModel({ ...req.body }).save();
     res.status(201).json({ data: doc });
@@ -22,14 +21,11 @@ const deleteOne = async (req, res) => {
 };
 
 const updateOne = async (req, res) => {
-  console.log(req.body);
-  console.log(req.params.id);
   try {
     const category = await CategoryModel.find({ label: req.body.label })
       .lean()
       .exec();
     if (category.length > 0) {
-      console.log("here");
       return res
         .status(500)
         .json({ errors: { label: { message: "category is unique" } } });

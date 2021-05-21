@@ -14,11 +14,8 @@ const editBook = (req, res) => {};
 const deleteBook = (req, res) => {};
 const changeBookShelf = (req, res) => {};
 const getBookShelve = async(req,res)=>{
-  console.log("ana wslt hna",'bookID',);
   try{
-  
-  const shelveStatus =  await  userBookModel.findOne({book:req.params.bookId, user:req.params.userId}).select({shelf:1})
-  console.log(shelveStatus);
+  const shelveStatus =  await  userBookModel.findOne({book:req.params.bookId, user:req.params.userId}).select({shelf:1,rating:1})
   res.status(200).json({data:shelveStatus})
 }
 catch(err){

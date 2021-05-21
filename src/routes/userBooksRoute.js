@@ -24,7 +24,7 @@ Router.patch("/:id", (req, res) => {
 Router.delete("/:id", (req, res) => {
   userBooksController.deleteBook(req, res);
 });
-Router.get('/:bookId/user/:userId/shelve',(req,res,next)=>{console.log("halaaa")
+Router.get('/:bookId/user/:userId/shelve',(req,res,next)=>{
  next()},userBooksController.getBookShelve)
 
 module.exports = Router;

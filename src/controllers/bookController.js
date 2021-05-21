@@ -117,7 +117,7 @@ async function updateBookAvgRating(bookId) {
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
   const book = await bookModel.findOneAndUpdate(
     { _id: bookId },
-    { avgRating: avgRating }
+    { avgRating: avgRating , ratings : ratings.length}
   );
 }
 

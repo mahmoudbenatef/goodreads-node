@@ -31,12 +31,12 @@ const bookSchema = new mongoose.Schema({
     min: 0,
     max: 5,
     default: 0,
-  },
+  }
 });
 
 // populate the author and cateogy to use it with pagination
 bookSchema.pre("find", function () {
-  this.populate("author").populate("category");
+  this.populate("author",{ firstname: 1, lastname: 1 , avatar: 1}).populate("category");
 });
 const BookModel = mongoose.model("Book", bookSchema);
 module.exports = BookModel;
