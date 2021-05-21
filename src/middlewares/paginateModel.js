@@ -25,12 +25,6 @@ const paginateMode = (model) => {
         limit: limit,
       };
     }
-
-    console.log(numberOfDocument);
-    console.log(limit);
-    console.log(result.count);
-    // getting the data base on the model
-
     try {
       if (req.params.id) {
         if (req.query.filter == 0) {

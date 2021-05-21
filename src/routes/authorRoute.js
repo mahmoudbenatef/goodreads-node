@@ -22,9 +22,6 @@ Router.get("/:id", (req, res, next) => {
 });
 
 Router.post("/", upload.single("avatar"), (req, res, next) => {
-  console.log("my request  file ", req.file)
-
-    console.log("my request ", req.body)
    authorController.createAuthor(req, res, next);
 });
 

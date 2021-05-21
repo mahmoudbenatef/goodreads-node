@@ -4,6 +4,8 @@ const statusCode = require("../helper/statusCode");
 const handler = require("../helper/controllersHelper");
 const authorValidator = require("../validators/authorValidator");
 const fs = require("fs");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 const getAllAuthors = async (req, res, next) => {
   const page = parseInt(req.query.page) || 0;
@@ -22,8 +24,6 @@ const getAllAuthors = async (req, res, next) => {
   // .limit(Page_Size)
   // .skip(page * Page_Size)
   if (allAuthors.length > 0) {
-    console.log("12 data before send", allAuthors);
-
     return res.status(statusCode.Success).json({
       totalPages: Math.ceil(total / Page_Size),
       allAuthors,
@@ -45,7 +45,6 @@ const getAuthorById = async (req, res, next) => {
 };
 const createAuthor = (req, res, next) => {
   const data = req.body;
-  console.log("the object", data);
   if (!data) handler.handelEmptyData(res);
   authorValidator.validateData({ ...data, avatar: req.file }, async (err) => {
     if (err) return next(err);
@@ -68,9 +67,6 @@ const deleteAuthor = async (req, res, next) => {
 
   if (!authorId) handler.handelEmptyData(res);
   const imagePath = await userModel.find({ _id: authorId });
-
-  console.log("imagePath", imagePath[0].avatar);
-
   try {
     const result = await userModel.findByIdAndDelete({ _id: authorId });
     res.status(statusCode.NoContent).end();
@@ -110,7 +106,25 @@ const updateAuthor = (req, res, next) => {
 const getAuthorBooks = async (req, res, next) => {
   try {
     const skip = req.params.skip;
-    const books = await bookModel.find({ author: req.params.id }).skip(+skip).limit(6);
+    const authorId = req.params.id;
+    const books = await bookModel.aggregate([
+      { $match: { author: ObjectId(authorId) } },
+      {
+        $lookup: {
+          from: "userbooks",
+          localField: "_id",
+          foreignField: "book",
+          as: "usersRatings",
+        },
+      },
+      {
+        $addFields: {
+          ratings: { $size: "$usersRatings" },
+        },
+      },
+      { $unset: "usersRatings"} 
+    ]).skip(+skip).limit(3);
+
     return res.send(books);
   } catch (err) {
     console.log(err);

@@ -31,11 +31,6 @@ const bookSchema = new mongoose.Schema({
     min: 0,
     max: 5,
     default: 0,
-  },
-  ratings: {
-    type: Number,
-    min: 0,
-    default: 0,
   }
 });
 
