@@ -7,6 +7,8 @@ const shelves = require("../helper/shelves");
 const UserModel = require("../models/userModel");
 const CategoryModel = require("../models/categoryModel.js");
 const userBookModel = require("../models/userBookModel");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 const getAllBooks = async (req, res) => {
   // get all books
@@ -117,7 +119,7 @@ async function updateBookAvgRating(bookId) {
     ratings.reduce((total, next) => total + next.rating, 0) / ratings.length;
   const book = await bookModel.findOneAndUpdate(
     { _id: bookId },
-    { avgRating: avgRating , ratings : ratings.length}
+    { avgRating: avgRating, ratings: ratings.length }
   );
 }
 
@@ -273,6 +275,26 @@ const getPopularAuthors = async (request, response) => {
   }
 };
 
+const getSearchResults = async (request, response) => {
+  try {
+    const searchRegex = new RegExp(request.params.value);
+    const authors = await UserModel.find(
+      { firstname: { $regex: searchRegex, $options: "i" } },
+      "_id"
+    );
+    const results = await bookModel.find({
+      $or: [
+        { name: { $regex: searchRegex, $options: "i" } },
+        { author: { $in: authors } },
+      ],
+    });
+    return response.json(results);
+  } catch (err) {
+    console.log(err);
+    return response.json(statusCode.ServerError);
+  }
+};
+
 module.exports = {
   getAllBooks,
   getBookById,
@@ -284,4 +306,5 @@ module.exports = {
   getPopularBooks,
   getPopularAuthors,
   reviewBook,
+  getSearchResults,
 };

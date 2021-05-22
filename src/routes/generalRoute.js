@@ -9,4 +9,7 @@ Router.get("/popular/categories", categoryController.getPopularCategories);
 
 Router.get("/popular/authors", bookController.getPopularAuthors);
 
+Router.get("/search/:value", bookController.getSearchResults);
+
+
 module.exports = Router;
