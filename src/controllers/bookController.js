@@ -279,7 +279,12 @@ const getSearchResults = async (request, response) => {
   try {
     const searchRegex = new RegExp(request.params.value);
     const authors = await UserModel.find(
-      { firstname: { $regex: searchRegex, $options: "i" } },
+      {
+        $or: [
+          { firstname: { $regex: searchRegex, $options: "i" } },
+          { lastname: { $regex: searchRegex, $options: "i" } },
+        ],
+      },
       "_id"
     );
     const results = await bookModel.find({
