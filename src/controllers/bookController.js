@@ -278,6 +278,7 @@ const getPopularAuthors = async (request, response) => {
 const getSearchResults = async (request, response) => {
   try {
     const searchRegex = new RegExp(request.params.value);
+    const skip = request.params.skip;
     const authors = await UserModel.find(
       {
         $or: [
@@ -292,7 +293,7 @@ const getSearchResults = async (request, response) => {
         { name: { $regex: searchRegex, $options: "i" } },
         { author: { $in: authors } },
       ],
-    });
+    }).skip(+skip).limit(4);
     return response.json(results);
   } catch (err) {
     console.log(err);
