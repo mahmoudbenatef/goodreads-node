@@ -28,5 +28,6 @@ Router.post("/:id/rate", bookController.rateBook);
 
 Router.post("/:id/shelve", bookController.shelveBook);
 Router.post("/:id/review", bookController.reviewBook);
+Router.delete("/:id/review", bookController.deleteReview);
 
 module.exports = Router;

@@ -73,7 +73,7 @@ const updateBook = (req, res, next) => {
   let data = req.body;
 
   // replace the field image with the path
-  if (req.file.path) {
+  if (req.file?.path) {
     data = {
       ...data,
       image: req.file.path,
@@ -87,6 +87,8 @@ const updateBook = (req, res, next) => {
     if (err) return next(err);
     try {
       // update the book with new data
+      console.log(data);
+
       const updatedBook = await bookModel
         .findByIdAndUpdate({ _id: req.params.id }, { ...data }, { new: true })
         .populate("author")
@@ -104,6 +106,9 @@ const deleteBook = async (req, res, next) => {
   if (!bookId) handler.handelEmptyData(res);
   try {
     const resulat = await bookModel.findByIdAndDelete({ _id: bookId });
+    const deleteBookFromAnyUserShelfs = await UserBookModel.deleteMany({
+      book: bookId,
+    });
     res.status(statusCode.NoContent).end();
   } catch (error) {
     next(error);
@@ -183,6 +188,20 @@ const reviewBook = async (req, res, next) => {
   }
 };
 
+const deleteReview = async (req, res, next) => {
+  if (!req.body) return handler.handelEmptyData();
+  const { reviewId } = req.body;
+  try {
+    const updatedBook = await UserBookModel.findOneAndUpdate(
+      { _id: reviewId },
+      { review: null }
+    );
+    return res.status(statusCode.Success).json(updatedBook);
+  } catch (error) {
+    next(error);
+  }
+};
+
 async function removeBookFromShelf({ bookId, userId }) {
   return await UserBookModel.findOneAndDelete({ book: bookId, user: userId });
 }
@@ -228,7 +247,6 @@ const getPopularBooks = async (request, response) => {
       { $group: { _id: "$book", books: { $sum: 1 } } },
       { $sort: { books: -1 } },
       { $limit: 4 },
-      { $unset: "books" },
       {
         $project: {
           _id: 0,
@@ -256,7 +274,6 @@ const getPopularAuthors = async (request, response) => {
       { $group: { _id: "$author", books: { $sum: 1 } } },
       { $sort: { books: -1 } },
       { $limit: 4 },
-      { $unset: "books" },
       {
         $project: {
           _id: 0,
@@ -288,12 +305,15 @@ const getSearchResults = async (request, response) => {
       },
       "_id"
     );
-    const results = await bookModel.find({
-      $or: [
-        { name: { $regex: searchRegex, $options: "i" } },
-        { author: { $in: authors } },
-      ],
-    }).skip(+skip).limit(4);
+    const results = await bookModel
+      .find({
+        $or: [
+          { name: { $regex: searchRegex, $options: "i" } },
+          { author: { $in: authors } },
+        ],
+      })
+      .skip(+skip)
+      .limit(4);
     return response.json(results);
   } catch (err) {
     console.log(err);
@@ -313,4 +333,5 @@ module.exports = {
   getPopularAuthors,
   reviewBook,
   getSearchResults,
+  deleteReview,
 };
