@@ -188,6 +188,20 @@ const reviewBook = async (req, res, next) => {
   }
 };
 
+const deleteReview = async (req, res, next) => {
+  if (!req.body) return handler.handelEmptyData();
+  const { reviewId } = req.body;
+  try {
+    const updatedBook = await UserBookModel.findOneAndUpdate(
+      { _id: reviewId },
+      { review: null }
+    );
+    return res.status(statusCode.Success).json(updatedBook);
+  } catch (error) {
+    next(error);
+  }
+};
+
 async function removeBookFromShelf({ bookId, userId }) {
   return await UserBookModel.findOneAndDelete({ book: bookId, user: userId });
 }
@@ -319,4 +333,5 @@ module.exports = {
   getPopularAuthors,
   reviewBook,
   getSearchResults,
+  deleteReview,
 };
