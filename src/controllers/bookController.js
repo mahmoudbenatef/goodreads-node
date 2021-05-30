@@ -73,12 +73,18 @@ const updateBook = (req, res, next) => {
   let data = req.body;
 
   // replace the field image with the path
-  if (req.file?.path) {
-    data = {
-      ...data,
-      image: req.file.path,
-    };
-  }
+
+  // if (req.file?.path) {
+  //   data = {
+  //     ...data,
+  //     image: req.file.path,
+  //   };
+  // }
+
+
+
+
+
   // function gard
   if (!data) handler.handelEmptyData(res);
 

@@ -68,6 +68,7 @@ const deleteAuthor = async (req, res, next) => {
   if (!authorId) handler.handelEmptyData(res);
   const imagePath = await userModel.find({ _id: authorId });
   try {
+    console.log("here to delete")
     const result = await userModel.findByIdAndDelete({ _id: authorId });
     res.status(statusCode.NoContent).end();
     fs.unlink(imagePath[0].avatar, (error) => {
@@ -122,7 +123,7 @@ const getAuthorBooks = async (req, res, next) => {
           ratings: { $size: "$usersRatings" },
         },
       },
-      { $unset: "usersRatings"} 
+      { $unset: "usersRatings" }
     ]).skip(+skip).limit(3);
 
     return res.send(books);

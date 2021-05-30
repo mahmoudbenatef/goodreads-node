@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
+
 const bcrypt = require("bcrypt");
+const bookModel = require("../models/bookModel");
+const userBookModel = require("../models/userBookModel");
 
 const UserScheme = new mongoose.Schema({
   firstname: {
     type: String,
     required: true,
-    },
+  },
   lastname: {
     type: String,
     required: true,
@@ -16,7 +19,7 @@ const UserScheme = new mongoose.Schema({
   },
   email: {
     type: String,
-     unique: true,
+    unique: true,
     lowercase: true,
     trim: true,
   },
@@ -52,6 +55,18 @@ UserScheme.methods.comparePassword = function (password, hash_password) {
     console.log(err);
   }
 };
+
+UserScheme.post('findOneAndDelete', async function (doc, next) {
+  const books = await bookModel.find({ author: doc._id }).lean().exec();
+  console.log(books)
+  books.forEach(async function (book) {
+    await userBookModel.deleteMany({
+      book: book._id
+    })
+  })
+  await bookModel.deleteMany({ author: doc._id })
+  next()
+})
 
 const UserModel = mongoose.model("User", UserScheme);
 module.exports = UserModel;
