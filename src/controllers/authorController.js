@@ -79,13 +79,17 @@ const deleteAuthor = async (req, res, next) => {
 };
 const updateAuthor = (req, res, next) => {
   let fakeAVA;
-  const data = { ...req.body };
+ let image =  req.file  ? req.file.path  :  undefined
+
+  const data =  image ?  { ...req.body , avatar :  image } :  { ...req.body }
+  console.log("dataaa", data)
 
   if (!data) handler.handelEmptyData(res);
   if (!data.avatar) {
     fakeAVA = { ...data, avatar: "fake" };
   } else {
-    fakeAVA = { ...req.body };
+
+    fakeAVA = image ?   { ...req.body , avatar :  req.file.path }: { ...req.body }
   }
 
   authorValidator.validateData(fakeAVA, async (err) => {
@@ -94,8 +98,11 @@ const updateAuthor = (req, res, next) => {
     try {
       const updated = await userModel.findByIdAndUpdate(
         { _id: req.params.id },
-        { ...data }
+        { ...data , DOB: req.body.dob  }
       );
+
+      console.log("updated", updated)
+
       res.status(statusCode.NoContent).end();
     } catch (error) {
       next(error);
